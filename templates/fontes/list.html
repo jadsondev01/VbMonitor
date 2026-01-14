@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold text-gray-800">Fontes</h1>
+        <a href="{% url 'core:listar_fontes' %}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Atualizar Lista</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-2 px-4 text-left">Nome</th>
+                    <th class="py-2 px-4 text-left">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fonte in fontes %}
+                    <tr class="border-t">
+                        <td class="py-2 px-4">
+                            {% if fonte.id %}
+                                <a href="{% url 'core:detalhe_fonte' fonte.id %}" class="text-blue-600 hover:underline">{{ fonte.nome }}</a>
+                            {% else %}
+                                {{ fonte.nome }}
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-4 space-x-2">
+                            {% if fonte.id %}
+                                <a href="{% url 'core:detalhe_fonte' fonte.id %}" class="text-blue-500 hover:underline">Detalhes</a>
+                            {% else %}
+                                ---
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" class="py-4 px-4 text-center text-gray-500">Nenhuma fonte encontrada.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

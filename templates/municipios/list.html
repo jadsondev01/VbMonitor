@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold text-gray-800">Municípios</h1>
+        <a href="{% url 'core:criar_municipio' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Novo Município</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-2 px-4 text-left">Nome</th>
+                    <th class="py-2 px-4 text-left">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for municipio in municipios %}
+                    <tr class="border-t">
+                        <td class="py-2 px-4">
+                            {% if municipio.id %}
+                                <a href="{% url 'core:detalhe_municipio' municipio.id %}" class="text-blue-600 hover:underline">{{ municipio.nome }}</a>
+                            {% else %}
+                                {{ municipio.nome }}
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-4 space-x-2">
+                            {% if municipio.id %}
+                                <a href="{% url 'core:editar_municipio' municipio.id %}" class="text-yellow-500 hover:underline">Editar</a>
+                                <a href="{% url 'core:excluir_municipio' municipio.id %}" class="text-red-500 hover:underline">Excluir</a>
+                            {% else %}
+                                ---
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" class="py-4 px-4 text-center text-gray-500">Nenhum município encontrado.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

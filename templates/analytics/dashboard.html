@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - VBMonitor{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-bar-chart"></i> Analytics</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Notícias por Fonte</div>
+            <div class="card-body">
+                <canvas id="fonteChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Notícias por Pauta</div>
+            <div class="card-body">
+                <canvas id="pautaChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Top Municípios</div>
+    <div class="card-body">
+        <canvas id="municipioChart"></canvas>
+    </div>
+</div>
+
+{{ fonte_labels|json_script:"fonte-labels" }}
+{{ fonte_data|json_script:"fonte-data" }}
+
+{{ pauta_labels|json_script:"pauta-labels" }}
+{{ pauta_data|json_script:"pauta-data" }}
+
+{{ municipio_labels|json_script:"municipio-labels" }}
+{{ municipio_data|json_script:"municipio-data" }}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function renderChart(id, labels, data, type) {
+    new Chart(document.getElementById(id), {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+renderChart(
+    'fonteChart',
+    JSON.parse(document.getElementById('fonte-labels').textContent),
+    JSON.parse(document.getElementById('fonte-data').textContent),
+    'bar'
+);
+
+renderChart(
+    'pautaChart',
+    JSON.parse(document.getElementById('pauta-labels').textContent),
+    JSON.parse(document.getElementById('pauta-data').textContent),
+    'pie'
+);
+
+renderChart(
+    'municipioChart',
+    JSON.parse(document.getElementById('municipio-labels').textContent),
+    JSON.parse(document.getElementById('municipio-data').textContent),
+    'bar'
+);
+</script>
+{% endblock %}

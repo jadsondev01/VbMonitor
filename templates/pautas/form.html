@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pauta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>
+        {% if form.instance.pk %}
+            Editar Pauta
+        {% else %}
+            Criar Pauta
+        {% endif %}
+    </h2>
+    <hr>
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        {% crispy form %}
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">
+                {% if form.instance.pk %}Atualizar{% else %}Salvar{% endif %}
+            </button>
+            <a href="{% url 'core:listar_pautas' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

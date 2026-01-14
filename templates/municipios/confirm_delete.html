@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="text-danger">
+    <i class="bi bi-exclamation-triangle"></i> Confirmar exclusão
+</h2>
+
+<p>Tem certeza que deseja excluir o município <strong>{{ municipio.nome }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        Sim, excluir
+    </button>
+    <a href="{% url 'listar_municipios' %}" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
+
+{% endblock %}

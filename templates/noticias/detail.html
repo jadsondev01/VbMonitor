@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ noticia.titulo|truncatechars:50 }} - VBMonitor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3">{{ noticia.titulo }}</h1>
+        <div class="text-muted">
+            <i class="bi bi-clock"></i> {{ noticia.data_publicacao|date:"d/m/Y H:i" }}
+            <span class="mx-2">•</span>
+            <i class="bi bi-eye"></i> {{ noticia.acessos }} acessos
+            <span class="mx-2">•</span>
+            <i class="bi bi-download"></i> Coletado em {{ noticia.coletado_em|date:"d/m/Y H:i" }}
+        </div>
+    </div>
+    <div>
+        <a href="{{ noticia.url }}" target="_blank" class="btn btn-outline-primary">
+            <i class="bi bi-link"></i> Ver Original
+        </a>
+        <a href="{% url 'admin:core_noticia_change' noticia.id %}" class="btn btn-outline-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-file-text"></i> Conteúdo</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <strong>Resumo:</strong>
+                    <p class="mt-2">{{ noticia.texto_resumo|linebreaks }}</p>
+                </div>
+
+                {% if noticia.conteudo %}
+                <div>
+                    <strong>Conteúdo Completo:</strong>
+                    <div class="mt-2 p-3 bg-light rounded" style="max-height: 400px; overflow-y: auto;">
+                        {{ noticia.conteudo|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Metadados</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong><i class="bi bi-link"></i> Fonte:</strong><br>
+                    <a href="{{ noticia.fonte.url_base }}" target="_blank">
+                        {{ noticia.fonte.nome }}
+                    </a>
+                </div>
+
+                <div class="mb-3">
+                    <strong><i class="bi bi-geo-alt"></i> Municípios:</strong><br>
+                    {% for cm in municipios %}
+                        <span class="badge bg-info me-1 mb-1">{{ cm.municipio.nome }}</span>
+                    {% empty %}
+                        <span class="text-muted">Nenhum município associado</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <strong><i class="bi bi-tags"></i> Pautas:</strong><br>
+                    {% for cp in pautas %}
+                        <span class="badge bg-primary me-1 mb-1">{{ cp.pauta.nome }}</span>
+                    {% empty %}
+                        <span class="text-muted">Nenhuma pauta associada</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <strong><i class="bi bi-bar-chart"></i> Estatísticas:</strong><br>
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between">
+                            <span>Acessos:</span>
+                            <span class="badge bg-primary">{{ noticia.acessos }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <span>Deduplicada:</span>
+                            <span class="badge bg-{% if noticia.deduplicado %}danger{% else %}success{% endif %}">
+                                {% if noticia.deduplicado %}Sim{% else %}Não{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning-charge"></i> Ações</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-success" id="btnRegistrarAcesso">
+                        <i class="bi bi-eye"></i> Registrar Acesso
+                    </button>
+                    <a href="{% url 'admin:core_noticia_change' noticia.id %}" class="btn btn-outline-warning">
+                        <i class="bi bi-pencil"></i> Classificar Manualmente
+                    </a>
+                    <button class="btn btn-outline-info" id="btnCopiarLink">
+                        <i class="bi bi-clipboard"></i> Copiar Link
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dados seguros para JS -->
+{{ noticia.id|json_script:"noticia-id" }}
+{{ noticia.url|json_script:"noticia-url" }}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getCSRFToken() {
+    return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const noticiaId = JSON.parse(
+        document.getElementById('noticia-id').textContent
+    );
+
+    const noticiaUrl = JSON.parse(
+        document.getElementById('noticia-url').textContent
+    );
+
+    document.getElementById('btnRegistrarAcesso').addEventListener('click', function () {
+        fetch(`/api/core/noticias/${noticiaId}/registrar_acesso/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Acesso registrado! Total: ' + data.acessos);
+            location.reload();
+        });
+    });
+
+    document.getElementById('btnCopiarLink').addEventListener('click', function () {
+        navigator.clipboard.writeText(noticiaUrl)
+            .then(() => alert('Link copiado para a área de transferência!'))
+            .catch(err => alert('Erro ao copiar: ' + err));
+    });
+});
+</script>
+{% endblock %}

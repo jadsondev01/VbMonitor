@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Alertas</h3>
+<div id="alertas-container"></div>
+
+<script>
+const ws = new WebSocket("ws://" + window.location.host + "/ws/alertas/");
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const container = document.getElementById("alertas-container");
+    const item = document.createElement("div");
+    item.innerHTML = `<a href="${data.url}" target="_blank">${data.titulo}</a> - ${new Date(data.data_publicacao).toLocaleString()}`;
+    container.prepend(item);
+};
+</script>
+{% endblock %}

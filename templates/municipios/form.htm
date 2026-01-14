@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="mb-4">
+    <i class="bi bi-geo-alt"></i>
+    {% if form.instance.pk %}Editar Município{% else %}Novo Município{% endif %}
+</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">Nome do município</label>
+        {{ form.nome }}
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        <i class="bi bi-save"></i> Salvar
+    </button>
+
+    <a href="{% url 'listar_municipios' %}" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
+
+{% endblock %}

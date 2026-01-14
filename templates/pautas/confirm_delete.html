@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Excluir Pauta{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-trash"></i> Excluir Pauta
+</h2>
+
+<p>Tem certeza que deseja excluir a pauta <strong>{{ pauta.nome }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        <i class="bi bi-trash"></i> Excluir
+    </button>
+    <a href="{% url 'listar_pautas' %}" class="btn btn-secondary">
+        <i class="bi bi-x-circle"></i> Cancelar
+    </a>
+</form>
+{% endblock %}
